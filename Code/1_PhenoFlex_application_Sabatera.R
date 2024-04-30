@@ -12,14 +12,14 @@ library(readxl)
 library(patchwork)
 
 # Upload forcing data
-forcing <- read_excel("Res_forc_vf.xlsx", sheet = "Feuil_vf",
+forcing <- read_excel("Data/Res_forc_vf.xlsx", sheet = "Feuil_vf",
                       col_types = c("date","text","text","text","numeric","numeric"))
 forcing<- as.data.frame(forcing)
 
 forcing_vf <- forcing[,c(1,3:6)]
 
 # Upload FFD data for all cultivars
-allvar_bloom <- read_excel("Bloom_9_cultivars.xlsx", sheet = "bloom")
+allvar_bloom <- read_excel("Data/Bloom_9_cultivars.xlsx", sheet = "bloom")
 
 # Get the column names except the first column
 second_cols <- names(allvar_bloom)[-1]

@@ -4,7 +4,7 @@ library(tidyverse)
 library(chillR)
 
 # Temperatures for the two years of forcing tests
-Temp_2021_2022 <- read_excel("Max_Min_Temp_2021_2022.xlsx",col_types = c("text", "numeric", "numeric", "numeric", "numeric", "numeric"))
+Temp_2021_2022 <- read_excel("Data/Max_Min_Temp_2021_2022.xlsx",col_types = c("text", "numeric", "numeric", "numeric", "numeric", "numeric"))
 Temp_2021_2022 <- as.data.frame(Temp_2021_2022)
 
 Temp_2021_2022 <- add_date(Temp_2021_2022)

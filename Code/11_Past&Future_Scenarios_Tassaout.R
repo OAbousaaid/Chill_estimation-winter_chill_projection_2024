@@ -10,7 +10,7 @@ library(ggpmisc)
 library(patchwork)
 
 # Upload temperature data (From Tassaout weather station)
-tassaout_weather <- read_xlsx("Temperature_72_22_max_min.xlsx")
+tassaout_weather <- read_xlsx("Data/Temperature_72_22_max_min.xlsx")
 tassaout_weather <- as.data.frame(tassaout_weather)
 
 # Making past scenarios

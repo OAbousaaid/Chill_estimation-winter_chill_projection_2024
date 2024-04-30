@@ -15,7 +15,7 @@ Sys.setlocale("LC_TIME", "English")
 
 # Leccino ####
 # Upload data
-forcing <- read_excel("Res_forc_vf.xlsx", sheet = "Feuil_vf",
+forcing <- read_excel("Data/Res_forc_vf.xlsx", sheet = "Feuil_vf",
                         col_types = c("date","text","text","text","numeric","numeric"))
 forcing<- as.data.frame(forcing)
 
