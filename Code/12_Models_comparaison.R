@@ -126,75 +126,9 @@ for(i in 2:length(chills))
 kable(future_data[1:5,])  %>%
   kable_styling("striped", position = "left",font_size = 8)
 
-# Using the function written by Luedeling to produce the plot with ggplot
-plot_scenarios_gg<-function(past_observed,
-                            past_simulated,
-                            future_data,
-                            metric,
-                            axis_label)
-{
-  rng<-range(past_observed[[metric]],
-             past_simulated[[metric]],
-             future_data[[metric]])  
-  past_plot<-ggplot() +
-    geom_boxplot(data = past_simulated,
-                 aes_string("as.numeric(Year)",metric,group="Year"),
-                 fill="skyblue") +
-    geom_hline(aes(yintercept = median(past_observed$Chill_CP)), color = "blue2", linetype = "solid") +
-    scale_y_continuous(limits = c(0, round(round(1.1*rng[2])))) +
-    labs(x = "Year", y = axis_label) +
-    facet_grid(~ Scenario) +
-    theme_bw(base_size = 15) +  
-    theme(strip.background = element_blank(),
-          strip.text = element_text(face = "bold"),
-          axis.text.x = element_text(angle=45, hjust=1)) +
-    geom_point(data = past_observed,
-               aes_string("End_year",metric),
-               col="blue")
-  
-  future_plot_list<-list()
-  
-  for(y in c(2050,2085))
-  {
-    future_plot_list[[which(y == c(2050,2085))]] <-
-      ggplot(data= future_data[which(future_data$Year==y),]) +
-      geom_boxplot(aes_string("GCM", metric, fill="GCM")) +
-      geom_hline(aes(yintercept = median(past_observed$Chill_CP)), color = "blue2", linetype = "solid") +
-      facet_wrap(vars(RCP)) +
-      scale_x_discrete(labels = NULL, expand = expansion(add = 1)) +
-      scale_y_continuous(limits = c(0, round(round(1.1*rng[2])))) +
-      geom_text_npc(aes(npcx = "center", npcy = "top", label = Year),
-                    size = 5) +
-      theme_bw(base_size = 15) +
-      theme(axis.ticks.y = element_blank(),
-            axis.text = element_blank(),
-            axis.title = element_blank(),
-            legend.position = "bottom",
-            legend.margin = margin(0, 0, 0, 0, "cm"),
-            legend.background = element_rect(),
-            strip.background = element_blank(),
-            strip.text = element_text(face = "bold"),
-            legend.box.spacing = unit(0, "cm"),
-            plot.subtitle = element_text(hjust = 0.5,
-                                         vjust = -1,
-                                         size = 15 * 1.05,
-                                         face = "bold")) 
-  }
-  
-  plot<- (past_plot +
-            future_plot_list +
-            plot_layout(guides = "collect",
-                        widths = c(1,rep(1.8,length(future_plot_list))))
-  ) & theme(legend.position = "bottom",
-            legend.text = element_text(size=8),
-            legend.title = element_text(size=10),
-            axis.title.x=element_blank())
-  plot
-  
-}
 
 # Chill plot
-plot_scenarios_gg(past_observed=past_observed,
+plot_scenarios_ggg(past_observed=past_observed,
                   past_simulated=past_simulated,
                   future_data=future_data,
                   metric="Chill_CP",
@@ -219,7 +153,7 @@ legend_names <- c("Past_observed"="Past observed",
                   "RCP4.5_2050"="RCP4.5 2050",
                   "RCP4.5_2085"="RCP4.5 2085",
                   "RCP8.5_2050"="RCP8.5 2050",
-                  "RCP8.5_2085"="RCP8.5 2080")
+                  "RCP8.5_2085"="RCP8.5 2085")
 
 future_past_data$Scenario <- factor(future_past_data$Scenario, levels = names(legend_names), labels = legend_names)
 
@@ -231,7 +165,8 @@ chill_plot <- ggplot(future_past_data,aes(Scenario,Chill_CP,fill=Scenario))+
   labs(y = "Chill Portions", x = "") +
   theme(legend.position = "bottom",
         axis.text.x = element_blank(),
-        axis.title = element_text(face = "bold"))
+        axis.title = element_text(face = "bold"))+
+  scale_y_continuous(limits = c(0,140),breaks = c(20,40,60,80,100,120,140))
 
 calib_chill_plot <- ggplot(future_past_data,aes(Scenario,Calib_Chill_CP,fill=Scenario))+
   geom_boxplot()+
@@ -239,7 +174,8 @@ calib_chill_plot <- ggplot(future_past_data,aes(Scenario,Calib_Chill_CP,fill=Sce
   labs(y = "Chill Portions", x = "") +
   theme(legend.position = "bottom",
         axis.text.x = element_blank(),
-        axis.title = element_text(face = "bold"))
+        axis.title = element_text(face = "bold"))+
+  scale_y_continuous(limits = c(70,140),breaks = c(80,100,120,140))
 
 # Temperature response for each model ####
 # Upload functions from helper functions by Fernandez et al., 2022
@@ -261,7 +197,7 @@ temp_response <- pivot_longer(temp_response, -Temp, names_to = "Var", values_to 
 # Chill plot
 chill_response_plot <- ggplot(filter(temp_response, Var == "Chill_res"), aes(Temp, Response)) +
   geom_line(size = 1, color = "blue4") +
-  scale_y_continuous(expand = expansion(mult = c(0.02, 0.02))) +
+  scale_y_continuous(limits=c(0,130),expand = expansion(mult = c(0.02, 0.02))) +
   scale_x_continuous(limits = c(-5, 25),
                      labels = function (x) paste0(x, " °C")) +
   scale_color_manual(values = c("blue", "red")) +
@@ -274,7 +210,7 @@ chill_response_plot <- ggplot(filter(temp_response, Var == "Chill_res"), aes(Tem
 
 def_chill_response_plot <- ggplot(filter(temp_response, Var == "Chill_res_def"), aes(Temp, Response)) +
   geom_line(size = 1, color = "blue4") +
-  scale_y_continuous(expand = expansion(mult = c(0.02, 0.02))) +
+  scale_y_continuous(limits=c(0,130),expand = expansion(mult = c(0.02, 0.02))) +
   scale_x_continuous(limits = c(-5, 25),
                      labels = function (x) paste0(x, " °C")) +
   scale_color_manual(values = c("blue", "red")) +
